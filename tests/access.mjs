@@ -1,0 +1,12 @@
+import assert from 'node:assert/strict';
+import {hasAccess,addMonth} from '../app/lib/access.ts';
+const now=Date.UTC(2026,10,4);
+assert.equal(hasAccess({role:'user',blocked:0,until:now+1},now),true);
+assert.equal(hasAccess({role:'user',blocked:0,until:now},now),false);
+assert.equal(hasAccess({role:'user',blocked:0,until:0},now),false);
+assert.equal(hasAccess({role:'admin',blocked:0,until:0},now),true);
+assert.equal(hasAccess({role:'admin',blocked:1,until:now+1},now),false);
+assert.equal(new Date(addMonth(Date.UTC(2027,0,31))).toISOString(),'2027-02-28T00:00:00.000Z');
+assert.equal(new Date(addMonth(Date.UTC(2028,0,31))).toISOString(),'2028-02-29T00:00:00.000Z');
+assert.equal(new Date(addMonth(Date.UTC(2026,11,15))).toISOString(),'2027-01-15T00:00:00.000Z');
+console.log('PASS: expiry boundary, blocked accounts, admin access, month-end and leap-year renewal');

@@ -1,0 +1,16 @@
+import fs from 'node:fs';
+import ts from 'typescript';
+import assert from 'node:assert/strict';
+const source=fs.readFileSync('app/game-widgets.tsx','utf8');
+const fn=source.slice(source.indexOf('export function reorder'),source.indexOf('export function ScheduleBoard')).replace('export ','');
+const js=ts.transpileModule(fn,{compilerOptions:{target:ts.ScriptTarget.ES2022}}).outputText;
+const reorder=new Function(js+';return reorder')();
+const base=[0,1,2,3,4,5];
+assert.deepEqual(reorder(base,0,5),[1,2,3,4,5,0]);
+assert.deepEqual(reorder(base,5,0),[5,0,1,2,3,4]);
+assert.deepEqual(reorder(base,2,2),base);
+assert.deepEqual(reorder(base,-1,2),base);
+assert.deepEqual(base,[0,1,2,3,4,5]);
+const app=fs.readdirSync('app').filter(n=>n.endsWith('.tsx')).map(n=>fs.readFileSync('app/'+n,'utf8')).join('\n');
+assert.equal(/\b(?:window\.)?(?:alert|confirm|prompt)\s*\(/.test(app),false);
+console.log('PASS: reorder forward/backward/boundary/source preservation; no native alert/confirm/prompt');

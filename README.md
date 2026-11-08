@@ -13,7 +13,7 @@ Platform media BK untuk guru sebagai fasilitator. Delapan media, empat bidang, m
 ## Login dan hosting saat ini
 Versi ini memakai autentikasi ChatGPT yang disediakan Sites. Situs terbit privat untuk pemilik, BUKAN peluncuran publik. Identitas berasal dari gateway tepercaya, bukan header browser yang dipercaya langsung. D1 dan migrasi diprovisikan melalui Sites.
 
-JANGAN mengunggah build ini langsung ke Worker publik yang menerima header identitas tanpa verifikasi. Untuk deploy mandiri di akun Cloudflare sendiri, integrasikan penyedia autentikasi publik yang memverifikasi token/sesi dan ganti adapter app/chatgpt-auth.ts. Domain saja tidak menyediakan autentikasi. Kode belum dihubungkan ke repositori GitHub milik pengguna.
+JANGAN mengunggah build ini langsung ke Worker publik yang menerima header identitas tanpa verifikasi. Untuk deploy mandiri di akun Cloudflare sendiri, integrasikan penyedia autentikasi publik yang memverifikasi token/sesi dan ganti adapter app/chatgpt-auth.ts. Domain saja tidak menyediakan autentikasi. Kode sumber tersedia di https://github.com/irvan678i7-prog/mediabk. Mengunggah kode ke GitHub tidak memindahkan database atau mengaktifkan hosting baru.
 
 ## Aktivasi admin
 1. Buka situs privat dan masuk dengan akun pemilik.
@@ -44,7 +44,7 @@ Untuk database lokal, build lalu jalankan perintah migrasi lokal pada README sta
 Isi media premium hanya di app/lib/media.ts (server); katalog publik di app/lib/media-public.ts. Jangan mengimpor konten premium ke Client Component.
 
 ## GitHub
-Simpan repositori sebagai privat. Jangan commit .env, .dev.vars, .wrangler, node_modules, dist, atau runtime credentials. Kode sumber dapat dipindahkan ke repositori GitHub setelah tujuan repositori ditentukan. Domain dan Cloudflare pribadi memerlukan konfigurasi terpisah, khususnya pengganti adapter autentikasi yang dijelaskan di atas.
+Jangan commit .env, .dev.vars, .wrangler, node_modules, dist, atau runtime credentials. Repositori ini menyimpan kode sumber; data akun, transaksi, dan secret tetap berada di konfigurasi/database server. Domain dan Cloudflare pribadi memerlukan konfigurasi terpisah, khususnya pengganti adapter autentikasi yang dijelaskan di atas.
 
 ## Pembaruan jenjang dan interaksi
 - `/login` merupakan halaman masuk terpisah; `/dashboard` memerlukan identitas terverifikasi. `/demo` menyediakan demo tanpa akses premium.
@@ -65,3 +65,8 @@ Pemeriksaan: `node tests/levels.mjs` memeriksa 24 kombinasi media/jenjang, jumla
 Semua konfirmasi aplikasi menggunakan dialog bergaya UI dengan fokus awal Batal, dukungan Escape, dan pengembalian fokus. Notifikasi dapat ditutup; status hasil permainan tetap dapat dibaca tanpa bergantung warna saja. Puzzle jadwal mendukung seret/lepas, tombol panah, dan dua ketukan untuk menukar kartu. TTS mendukung pemilihan petunjuk, sorot kata aktif, maju otomatis, tombol panah, dan Backspace. Tata letak kontrol, papan tim, serta dialog disesuaikan untuk layar kecil; reduced-motion tetap didukung.
 
 `node tests/widgets.mjs` memeriksa pemindahan kartu, batas indeks, keutuhan urutan sumber, dan ketiadaan pop-up native browser dalam komponen aplikasi.
+
+Pemeriksaan browser 5 November 2026: dialog batal/setuju dan detail media mendukung Escape serta pengembalian fokus; dua ketukan dan tombol urutan mengubah kartu; TTS maju mengikuti arah petunjuk dan Backspace kembali ke sel sebelumnya. Komponen jadwal dan TTS diperiksa pada frame 360 px tanpa overflow horizontal. Pengujian ini tidak mencakup transaksi pembayaran langsung.
+
+## Status pertemuan lanjutan
+Delapan pertemuan 9–16 sudah dirancang dalam percakapan, tetapi belum diimplementasikan sebagai media aplikasi: Detektif Kekuatan Diri; Misi Berani Bicara; Jembatan Salah Paham; Jejak Digital: Pilih Sebelum Kirim; Laboratorium Cara Belajar; Bos Terakhir: Kebiasaan Menunda; Ekspedisi Dunia Kerja; Peta Langkah Masa Depanku. Rencana durasi masing-masing 45 menit, mengikuti alur enam tahap dan penyesuaian SMP/SMA/SMK.

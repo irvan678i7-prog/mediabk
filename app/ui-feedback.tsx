@@ -1,0 +1,16 @@
+'use client';
+import {createContext,useCallback,useContext,useEffect,useRef,useState} from 'react';
+import {CheckCircle2,Info,AlertCircle,ShieldCheck,X} from 'lucide-react';
+type Options={title:string;message:string;accept?:string;danger?:boolean};
+const UI=createContext<{ask:(o:Options)=>Promise<boolean>;notify:(text:string)=>void}>({ask:async()=>false,notify:()=>{}});
+export const useFeedback=()=>useContext(UI);
+export function Notice({children,kind='info',onClose}:{children:React.ReactNode;kind?:'info'|'success'|'error';onClose?:()=>void}){const Icon=kind==='error'?AlertCircle:kind==='success'?CheckCircle2:Info;return <div className={'ui-notice '+kind} role={kind==='error'?'alert':'status'}><Icon size={20}/><div>{children}</div>{onClose&&<button className="iconbtn" onClick={onClose} aria-label="Tutup notifikasi"><X size={17}/></button>}</div>}
+export default function FeedbackProvider({children}:{children:React.ReactNode}){const [options,setOptions]=useState<Options|null>(null),[toast,setToast]=useState('');const pending=useRef<((v:boolean)=>void)|null>(null),dialog=useRef<HTMLDialogElement>(null),cancel=useRef<HTMLButtonElement>(null),previous=useRef<HTMLElement|null>(null);
+const ask=useCallback((o:Options)=>{if(pending.current)return Promise.resolve(false);previous.current=document.activeElement as HTMLElement;return new Promise<boolean>(resolve=>{pending.current=resolve;setOptions(o)})},[]);
+function finish(value:boolean){const resolve=pending.current;pending.current=null;dialog.current?.close();setOptions(null);resolve?.(value);previous.current?.focus();}
+useEffect(()=>{if(options&&!dialog.current?.open){dialog.current?.showModal();cancel.current?.focus()}},[options]);
+useEffect(()=>{if(!toast)return;const t=setTimeout(()=>setToast(''),4500);return()=>clearTimeout(t)},[toast]);
+useEffect(()=>()=>{pending.current?.(false);pending.current=null},[]);
+return <UI.Provider value={{ask,notify:setToast}}>{children}<dialog ref={dialog} className="ui-dialog" aria-labelledby="confirm-title" aria-describedby="confirm-description" onCancel={e=>{e.preventDefault();finish(false)}} onClose={()=>{if(!dialog.current?.open&&pending.current)finish(false)}}><div className={'dialog-symbol '+(options?.danger?'caution':'')}><ShieldCheck size={28}/></div><div className="eyebrow">KONFIRMASI TINDAKAN</div><h2 id="confirm-title">{options?.title}</h2><p id="confirm-description">{options?.message}</p><div className="dialog-buttons"><button ref={cancel} className="outline" onClick={()=>finish(false)}>Batal</button><button className={'darkbtn '+(options?.danger?'dangerbtn':'')} onClick={()=>finish(true)}>{options?.accept||'Lanjutkan'}</button></div></dialog>{toast&&<div className="toast-zone"><Notice kind="success" onClose={()=>setToast('')}>{toast}</Notice></div>}</UI.Provider>}
+
+export function ContentDialog({title,onClose,children}:{title:string;onClose:()=>void;children:React.ReactNode}){const ref=useRef<HTMLDialogElement>(null);useEffect(()=>{const previous=document.activeElement as HTMLElement;ref.current?.showModal();return()=>{ref.current?.close();previous?.focus()}},[]);return <dialog ref={ref} className="modal content-dialog" aria-label={title} onCancel={e=>{e.preventDefault();onClose()}}><button className="close iconbtn" aria-label="Tutup" onClick={onClose}><X/></button>{children}</dialog>}
