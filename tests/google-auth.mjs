@@ -1,0 +1,16 @@
+import assert from 'node:assert/strict';
+import {generateKeyPair,exportJWK,createLocalJWKSet,SignJWT} from 'jose';
+import {verifyGoogleCredential,hashToken,randomToken} from '../app/lib/google-token.ts';
+const {publicKey,privateKey}=await generateKeyPair('RS256');
+const key={...await exportJWK(publicKey),kid:'test',alg:'RS256'};
+const keys=createLocalJWKSet({keys:[key]});
+const now=Math.floor(Date.now()/1000),base={sub:'google-user',email:'guru@gmail.com',email_verified:true,nonce:'challenge',iss:'https://accounts.google.com',aud:'client',iat:now,exp:now+300};
+const sign=p=>new SignJWT(p).setProtectedHeader({alg:'RS256',kid:'test'}).sign(privateKey);
+const check=t=>verifyGoogleCredential(t,'client','challenge',keys);
+assert.equal((await check(await sign(base))).subject,'google-user');
+for(const patch of [{aud:'attacker'},{iss:'attacker'},{exp:now-1},{iat:now-601},{nonce:'wrong'},{email_verified:false},{email:'guru@other.test'},{azp:'attacker'},{sub:''},{nonce:undefined}])await assert.rejects(()=>sign({...base,...patch}).then(check));
+assert.equal((await check(await sign({...base,email:'guru@school.test',hd:'school.test'}))).email,'guru@school.test');
+await assert.rejects(()=>sign({...base,email:'guru@school.test',hd:'other.test'}).then(check));
+const signed=await sign(base),parts=signed.split('.');parts[1]=Buffer.from(JSON.stringify({...base,sub:'admin'})).toString('base64url');await assert.rejects(()=>check(parts.join('.')));
+const token=randomToken();assert.match(token,/^[a-f0-9]{64}$/);assert.notEqual(token,randomToken());assert.match(await hashToken(token),/^[a-f0-9]{64}$/);assert.notEqual(await hashToken(token),token);
+console.log('PASS: signed Google identity, audience, issuer, time, nonce, email ownership, tampering, session entropy/hash');

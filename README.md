@@ -11,12 +11,12 @@ Platform media BK untuk guru sebagai fasilitator. Delapan media, empat bidang, m
 - Pencegahan konfirmasi pending ganda dan persetujuan berulang.
 
 ## Login dan hosting saat ini
-Versi ini memakai autentikasi ChatGPT yang disediakan Sites. Situs terbit privat untuk pemilik, BUKAN peluncuran publik. Identitas berasal dari gateway tepercaya, bukan header browser yang dipercaya langsung. D1 dan migrasi diprovisikan melalui Sites.
+Halaman masuk dan demo dapat diakses publik tanpa ChatGPT. Login utama menggunakan Google Identity Services dan sesi aman aplikasi di D1. Tombol Google baru aktif setelah runtime GOOGLE_CLIENT_ID dikonfigurasi. Ikuti [panduan aktivasi Google](docs/GOOGLE_LOGIN.md).
 
-JANGAN mengunggah build ini langsung ke Worker publik yang menerima header identitas tanpa verifikasi. Untuk deploy mandiri di akun Cloudflare sendiri, integrasikan penyedia autentikasi publik yang memverifikasi token/sesi dan ganti adapter app/chatgpt-auth.ts. Domain saja tidak menyediakan autentikasi. Kode sumber tersedia di https://github.com/irvan678i7-prog/mediabk. Mengunggah kode ke GitHub tidak memindahkan database atau mengaktifkan hosting baru.
+Identitas gateway Sites dipertahankan untuk migrasi akun lama. Jangan deploy backend ini di hosting yang mempercayai header identitas dari internet tanpa gateway tepercaya. Mengunggah kode ke GitHub tidak memindahkan database atau secret.
 
 ## Aktivasi admin
-1. Buka situs privat dan masuk dengan akun pemilik.
+1. Masuk dengan Google setelah konfigurasi aktif. Untuk admin lama, ikuti penautan akun di docs/GOOGLE_LOGIN.md.
 2. Buka Kelola Admin, masukkan ADMIN_SETUP_KEY yang disampaikan terpisah.
 3. Admin pertama ditautkan secara atomik di settings; kode tidak dapat mengambil alih admin yang sudah terbentuk.
 4. Atur tarif dan rekening milik Anda. Nilai awal kosong; aplikasi tidak menampilkan rekening atau harga rekaan.
@@ -38,6 +38,8 @@ Untuk database lokal, build lalu jalankan perintah migrasi lokal pada README sta
 - `npx tsc --noEmit`
 - `node --experimental-strip-types tests/access.mjs`
 - `python3 tests/database.py`
+- `node --experimental-strip-types tests/google-auth.mjs`
+- `python3 tests/auth-storage.py`
 - `tests/api.py`: tes integrasi khusus preview lokal; membutuhkan fixture qa-admin dan tabel lokal. Host tertulis eksplisit untuk menghindari tes pada produksi.
 - `npm run build`
 
@@ -48,11 +50,11 @@ Jangan commit .env, .dev.vars, .wrangler, node_modules, dist, atau runtime crede
 
 ## Pembaruan jenjang dan interaksi
 - `/login` merupakan halaman masuk terpisah; `/dashboard` memerlukan identitas terverifikasi. `/demo` menyediakan demo tanpa akses premium.
-- Admin membuat profil guru lewat email, nama, sekolah, dan jenjang SMP/SMA/SMK; profil ditautkan saat guru masuk memakai email ChatGPT yang sama. Ini bukan pembuatan akun/password ChatGPT.
+- Admin membuat profil guru lewat email, nama, sekolah, dan jenjang SMP/SMA/SMK; profil ditautkan saat guru masuk memakai email Google yang sama. Ini bukan pembuatan akun/password Google.
 - Penempatan jenjang disimpan di tabel teachers. Guru tidak dapat mengganti jenjang melalui parameter URL. Admin dapat mempratinjau semua jenjang. Profil lama perlu ditetapkan jenjangnya agar dapat membuka premium.
 - Delapan media mempunyai penyesuaian situasi, contoh profesi, petunjuk belajar atau refleksi menurut jenjang. Materi dasar lintas jenjang tetap digunakan bila relevan.
 - Bimo merespons interaksi dengan animasi dan pesan. Efek audio dibuat secara lokal memakai Web Audio. Pembacaan soal memakai suara bahasa Indonesia dari browser/perangkat; ketersediaan suara bergantung perangkat. Audio dapat dimatikan dan pembacaan dihentikan. Preferensi reduced-motion dihormati.
-- Halaman login aplikasi tetap berada di balik gerbang privat hosting. Pendaftaran profil guru tidak otomatis memberikan izin mengakses hosting privat; perlu pengaturan akses ketika diluncurkan untuk guru lain.
+- Halaman login aplikasi dan demo dapat dibuka publik. Profil guru dan langganan tetap diperiksa oleh server.
 
 ## Sesi layanan 45 menit
 Semua media memakai enam tahap: pembuka 5, pemanasan 5, permainan inti 15, misi penerapan 10, berbagi hasil 5, dan refleksi 5 menit. Alokasi merupakan panduan fasilitasi, bukan durasi video atau penguncian otomatis. Guru dapat menjeda timer atau berpindah tahap sesuai kebutuhan kelas.

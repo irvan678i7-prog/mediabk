@@ -15,6 +15,13 @@
       "when": 1793793214307,
       "tag": "0001_tidy_champions",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1794206993313,
+      "tag": "0002_worried_kingpin",
+      "breakpoints": true
     }
   ]
 }

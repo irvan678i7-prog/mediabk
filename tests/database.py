@@ -1,6 +1,7 @@
 import sqlite3,pathlib
 c=sqlite3.connect(':memory:')
-c.executescript(next(pathlib.Path('drizzle').glob('*.sql')).read_text().replace('--> statement-breakpoint',''))
+for migration in sorted(pathlib.Path('drizzle').glob('*.sql')):
+ c.executescript(migration.read_text().replace('--> statement-breakpoint',''))
 c.execute("INSERT INTO users VALUES ('u','u@example.test','Guru','user',0,0)")
 c.execute("INSERT INTO payments VALUES ('p','u',25000,'Guru','REF-123','pending',1,NULL,NULL)")
 def approve():

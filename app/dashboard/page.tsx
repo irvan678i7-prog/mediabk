@@ -1,4 +1,4 @@
 import Portal from '../portal';
-import {requireChatGPTUser} from '../chatgpt-auth';
+import {requireUser} from '../auth';
 export const dynamic='force-dynamic';
-export default async function Dashboard(){await requireChatGPTUser('/dashboard');return <Portal/>}
+export default async function Dashboard(){await requireUser();return <Portal/>}

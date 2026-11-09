@@ -4,3 +4,7 @@ export const settings = sqliteTable('settings',{id:integer('id').primaryKey(),pr
 export const payments = sqliteTable('payments',{id:text('id').primaryKey(),userId:text('user_id').notNull(),amount:integer('amount').notNull(),sender:text('sender').notNull(),reference:text('reference').notNull(),status:text('status').notNull().default('pending'),created:integer('created').notNull(),reviewed:integer('reviewed'),reviewer:text('reviewer')});
 
 export const teachers = sqliteTable("teachers",{email:text("email").primaryKey(),name:text("name").notNull(),school:text("school").notNull().default(""),grade:text("grade").notNull()});
+
+export const googleIdentities=sqliteTable('google_identities',{subject:text('subject').primaryKey(),userId:text('user_id').notNull()});
+export const authSessions=sqliteTable('auth_sessions',{tokenHash:text('token_hash').primaryKey(),userId:text('user_id').notNull(),expiresAt:integer('expires_at').notNull()});
+export const authChallenges=sqliteTable('auth_challenges',{tokenHash:text('token_hash').primaryKey(),nonce:text('nonce').notNull(),expiresAt:integer('expires_at').notNull()});
